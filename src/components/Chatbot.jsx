@@ -1,115 +1,140 @@
-import { useState, useMemo } from 'react';
-import { Sparkles, Send } from 'lucide-react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { Send, Sparkles } from 'lucide-react';
 
-const starterSuggestions = [
-  'Help me draft a college list for Computer Science',
-  'What extracurriculars strengthen my profile for engineering?',
-  'Explain Early Action vs Early Decision',
-  'Give me essay ideas from my volunteering with seniors',
+const commonAppPrompts = [
+  'Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.',
+  'The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn from the experience?',
+  'Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?',
+  'Reflect on something that someone has done for you that has made you happy or thankful in a surprising way. How has this gratitude affected or motivated you?',
+  'Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.',
+  'Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?',
+  'Share an essay on any topic of your choice. It can be one you have already written, one that responds to a different prompt, or one of your own design.'
 ];
 
-export default function Chatbot({ onExploreColleges }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content:
-        "Hi! I'm your admissions co‑pilot. Ask about colleges, essays, financial aid, or building your application.",
-    },
-  ]);
+export default function Chatbot() {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const listRef = useRef(null);
 
-  const hasUserMessage = useMemo(
-    () => messages.some((m) => m.role === 'user'),
-    [messages]
-  );
+  const hasMessages = messages.length > 0;
 
-  const send = async (preset) => {
-    const text = (preset ?? input).trim();
-    if (!text) return;
-    setMessages((m) => [...m, { role: 'user', content: text }]);
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const handleSend = (text) => {
+    const content = (text ?? input).trim();
+    if (!content) return;
+
+    const next = [...messages, { role: 'user', content }];
+    setMessages(next);
     setInput('');
     setLoading(true);
 
+    // Stubbed AI response
     setTimeout(() => {
-      setMessages((m) => [
-        ...m,
+      setMessages([
+        ...next,
         {
           role: 'assistant',
           content:
-            'Great question! I can suggest colleges, estimate reach/target/safety based on your interests, and help with essay prompts. Use the Colleges tab to explore schools and the Essays tab to draft and refine writing with AI.',
+            "Thanks for sharing! I’ll analyze this and suggest structure, key themes, and areas to deepen your reflection. Want me to outline a 3-part draft?",
         },
       ]);
       setLoading(false);
-    }, 800);
+    }, 900);
   };
 
   return (
-    <section className="text-[17px]">
-      <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold tracking-tight text-zinc-900">Admissions Advisor</h2>
-          <button
-            onClick={onExploreColleges}
-            className="rounded-full bg-[#2563eb] px-4 py-2 text-sm font-medium text-white shadow hover:brightness-110"
-          >
-            Explore Colleges
-          </button>
+    <div className="flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200">
+        <div className="h-7 w-7 rounded-md bg-blue-600 text-white grid place-items-center text-sm font-medium">
+          AI
         </div>
+        <div>
+          <p className="text-sm font-medium text-slate-900">Admissions Advisor</p>
+          <p className="text-xs text-slate-500">Ask anything about colleges, majors, and essays</p>
+        </div>
+      </div>
 
-        <div className="h-[60vh] overflow-y-auto rounded-xl bg-zinc-50 p-4 ring-1 ring-black/5">
-          {messages.map((m, i) => (
-            <div key={i} className="mb-4">
-              <div
-                className={`max-w-prose rounded-2xl px-4 py-3 text-[16px] leading-relaxed ${
-                  m.role === 'assistant'
-                    ? 'bg-white text-zinc-800 ring-1 ring-black/10'
-                    : 'ml-auto bg-[#2563eb] text-white'
-                }`}
+      {/* Messages */}
+      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {!hasMessages && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center gap-2 text-slate-700">
+              <Sparkles className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">Common App essay prompts</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Choose a prompt to start drafting or ask any question below.
+            </p>
+
+            <div className="mt-3">
+              <select
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v) handleSend(v);
+                }}
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                defaultValue=""
               >
-                {m.content}
-              </div>
-            </div>
-          ))}
-          {loading && <div className="text-sm text-zinc-500">Thinking…</div>}
-
-          {!hasUserMessage && !loading && (
-            <div className="mt-2">
-              <p className="mb-2 text-sm font-medium text-zinc-600">Suggested prompts</p>
-              <div className="flex flex-wrap gap-2">
-                {starterSuggestions.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => send(s)}
-                    className="rounded-full bg-white px-3 py-1.5 text-[14px] text-zinc-700 ring-1 ring-black/10 hover:bg-zinc-50"
-                  >
-                    <Sparkles size={14} className="mr-1 inline text-[#2563eb]" /> {s}
-                  </button>
+                <option value="" disabled>
+                  Select a prompt to begin…
+                </option>
+                {commonAppPrompts.map((p, i) => (
+                  <option key={i} value={p} className="text-wrap">
+                    Prompt {i + 1}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 rounded-xl bg-white ring-1 ring-black/10">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="Ask anything about applications…"
-              className="w-full bg-transparent px-3 py-3 text-[16px] outline-none placeholder:text-zinc-400"
-            />
           </div>
-          <button
-            onClick={() => send()}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-[15px] font-medium text-white shadow hover:brightness-110"
+        )}
+
+        {messages.map((m, idx) => (
+          <div
+            key={idx}
+            className={
+              m.role === 'user'
+                ? 'ml-auto max-w-[85%] rounded-lg bg-blue-600 text-white px-3 py-2 text-sm'
+                : 'mr-auto max-w-[85%] rounded-lg bg-slate-100 text-slate-800 px-3 py-2 text-sm'
+            }
           >
-            <Send size={18} />
+            {m.content}
+          </div>
+        ))}
+
+        {loading && (
+          <div className="mr-auto max-w-[85%] rounded-lg bg-slate-100 text-slate-500 px-3 py-2 text-sm animate-pulse">
+            Thinking…
+          </div>
+        )}
+      </div>
+
+      {/* Composer */}
+      <div className="p-3 border-t border-slate-200">
+        <div className="flex gap-2">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about admissions, scholarships, or paste your draft to refine…"
+            rows={4}
+            className="flex-1 resize-none rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]"
+          />
+          <button
+            onClick={() => handleSend()}
+            className="self-end inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium shadow hover:bg-blue-700 disabled:opacity-50"
+            disabled={loading || !input.trim()}
+          >
+            <Send className="h-4 w-4" />
             Send
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
