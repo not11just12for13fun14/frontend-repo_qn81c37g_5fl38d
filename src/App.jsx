@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import Navbar from './components/Navbar.jsx';
-import Hero from './components/Hero.jsx';
 import Chatbot from './components/Chatbot.jsx';
 import CollegeBrowser from './components/CollegeBrowser.jsx';
 import EssayBuilder from './components/EssayBuilder.jsx';
@@ -98,11 +97,7 @@ export default function App() {
 
       <Navbar active={active} onChange={setActive} />
 
-      <div className="mx-auto max-w-7xl px-6 pt-28">
-        <Hero />
-      </div>
-
-      <main className="mx-auto max-w-7xl px-6 pb-28 pt-10 text-[17px] leading-[1.8]">
+      <main className="mx-auto max-w-7xl px-6 pb-28 pt-28 text-[17px] leading-[1.8]">
         {active === 'chat' && (
           <Chatbot onExploreColleges={() => setActive('colleges')} />
         )}

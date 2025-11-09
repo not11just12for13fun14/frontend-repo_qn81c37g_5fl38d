@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Sparkles, Send } from 'lucide-react';
 
 const starterSuggestions = [
   'Help me draft a college list for Computer Science',
   'What extracurriculars strengthen my profile for engineering?',
-  'Explain the difference between Early Action and Early Decision',
-  'Give me essay ideas based on my volunteering',
+  'Explain Early Action vs Early Decision',
+  'Give me essay ideas from my volunteering with seniors',
 ];
 
 export default function Chatbot({ onExploreColleges }) {
@@ -13,14 +13,19 @@ export default function Chatbot({ onExploreColleges }) {
     {
       role: 'assistant',
       content:
-        "Hi! I'm your admissions co-pilot. Ask about colleges, essays, financial aid, or building your application.",
+        "Hi! I'm your admissions co‑pilot. Ask about colleges, essays, financial aid, or building your application.",
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const send = async () => {
-    const text = input.trim();
+  const hasUserMessage = useMemo(
+    () => messages.some((m) => m.role === 'user'),
+    [messages]
+  );
+
+  const send = async (preset) => {
+    const text = (preset ?? input).trim();
     if (!text) return;
     setMessages((m) => [...m, { role: 'user', content: text }]);
     setInput('');
@@ -40,8 +45,8 @@ export default function Chatbot({ onExploreColleges }) {
   };
 
   return (
-    <section className="grid grid-cols-1 gap-8 lg:grid-cols-3 text-[17px]">
-      <div className="col-span-2 rounded-2xl border border-black/10 bg-white p-5 shadow-xl">
+    <section className="text-[17px]">
+      <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold tracking-tight text-zinc-900">Admissions Advisor</h2>
           <button
@@ -52,7 +57,7 @@ export default function Chatbot({ onExploreColleges }) {
           </button>
         </div>
 
-        <div className="h-[52vh] overflow-y-auto rounded-xl bg-zinc-50 p-4 ring-1 ring-black/5">
+        <div className="h-[60vh] overflow-y-auto rounded-xl bg-zinc-50 p-4 ring-1 ring-black/5">
           {messages.map((m, i) => (
             <div key={i} className="mb-4">
               <div
@@ -66,8 +71,23 @@ export default function Chatbot({ onExploreColleges }) {
               </div>
             </div>
           ))}
-          {loading && (
-            <div className="text-sm text-zinc-500">Thinking…</div>
+          {loading && <div className="text-sm text-zinc-500">Thinking…</div>}
+
+          {!hasUserMessage && !loading && (
+            <div className="mt-2">
+              <p className="mb-2 text-sm font-medium text-zinc-600">Suggested prompts</p>
+              <div className="flex flex-wrap gap-2">
+                {starterSuggestions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => send(s)}
+                    className="rounded-full bg-white px-3 py-1.5 text-[14px] text-zinc-700 ring-1 ring-black/10 hover:bg-zinc-50"
+                  >
+                    <Sparkles size={14} className="mr-1 inline text-[#2563eb]" /> {s}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -82,30 +102,12 @@ export default function Chatbot({ onExploreColleges }) {
             />
           </div>
           <button
-            onClick={send}
+            onClick={() => send()}
             className="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-[15px] font-medium text-white shadow hover:brightness-110"
           >
             <Send size={18} />
             Send
           </button>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-xl">
-        <h3 className="mb-3 text-lg font-semibold tracking-tight text-zinc-900">Try asking</h3>
-        <div className="grid gap-2">
-          {starterSuggestions.map((s) => (
-            <button
-              key={s}
-              onClick={() => setInput(s)}
-              className="rounded-xl border border-black/10 bg-zinc-50 px-3 py-2 text-left text-[15px] text-zinc-700 hover:bg-white"
-            >
-              <Sparkles size={16} className="mr-1 inline text-[#2563eb]" /> {s}
-            </button>
-          ))}
-        </div>
-        <div className="mt-6 rounded-xl bg-gradient-to-br from-[#2563eb]/15 to-sky-400/10 p-4 text-[15px] text-zinc-700 ring-1 ring-black/10">
-          Tip: Keep a running list of schools you like. You can view All or just Your List in the Colleges section.
         </div>
       </div>
     </section>
