@@ -82,25 +82,22 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-white text-zinc-900 relative overflow-hidden">
       {/* Soft brand glow background */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-50"
-        aria-hidden="true"
-      >
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="absolute -top-24 -left-28 h-[40rem] w-[40rem] rounded-full blur-3xl"
-          style={{ background: `${BRAND_BLUE}33` }}
+          style={{ background: `${BRAND_BLUE}22` }}
         />
         <div
           className="absolute -bottom-20 -right-24 h-[35rem] w-[35rem] rounded-full blur-3xl"
-          style={{ background: '#0ea5e933' }}
+          style={{ background: '#60a5fa22' }}
         />
       </div>
 
       <Navbar active={active} onChange={setActive} />
 
-      <main className="mx-auto max-w-7xl px-4 pb-24 pt-28">
+      <main className="mx-auto max-w-7xl px-6 pb-28 pt-32 text-[17px] leading-[1.8]">
         {active === 'chat' && (
           <Chatbot onExploreColleges={() => setActive('colleges')} />
         )}
