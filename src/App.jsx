@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
 import Chatbot from './components/Chatbot';
 import Colleges from './components/Colleges';
 import Essays from './components/Essays';
@@ -12,12 +11,7 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
       <Navbar activeTab={tab} onTabChange={setTab} />
 
-      {/* Hero */}
-      <div className="pt-16">
-        <Hero />
-      </div>
-
-      <main className="max-w-6xl mx-auto px-4 pb-16 -mt-20">
+      <main className="max-w-6xl mx-auto px-4 pt-20 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {tab === 'advisor' && (
@@ -29,9 +23,7 @@ export default function App() {
             {tab === 'essays' && <Essays />}
           </div>
 
-          <div className="hidden lg:block">
-            {/* Right column intentionally empty per request (tips panel removed) */}
-          </div>
+          <div className="hidden lg:block"></div>
         </div>
       </main>
     </div>
